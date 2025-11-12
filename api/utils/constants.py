@@ -11,3 +11,7 @@ class Constants:
     PAGE_INIT = 0
 
     DEFAULT_THRESHOLD = 10
+
+    DEFAULT_TAX = 1
+
+    DEFAULT_CURRENCY = "USD"

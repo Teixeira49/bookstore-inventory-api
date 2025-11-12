@@ -94,8 +94,11 @@ class BookService:
             
             exchanges = get_global_exchanges()
 
-            if currency_code.code not in exchanges["data"].keys():
+            if currency_code.code not in exchanges["data"].keys() and exchanges["status_code"] == 200:
                 raise HTTPException(status_code=404, detail=f"El codigo de moneda {currency_code.code} no esta disponible")
+
+            if exchanges["status_code"] != 200:
+                currency_code.code = Constants.DEFAULT_CURRENCY
 
             exchange_rate = exchanges["data"][currency_code.code]
 

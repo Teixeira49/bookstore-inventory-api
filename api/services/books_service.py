@@ -149,13 +149,24 @@ class BookService:
             raise http_exc
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error interno del servidor: {e}")
-        
+
+    async def low_stock_books(self, threshold: Optional[int] = None):
+        try:
+            if threshold is None:
+                threshold = Constants.DEFAULT_THRESHOLD
+            
+            books = search_by_stock_quantity_to_db(threshold)
+            if not books:
+                raise HTTPException(status_code=404, detail="No se encontraron libros.")
+            books_dict = [book.dict() for book in books]
+            return api_response(data=books_dict)
+        except HTTPException as http_exc:
+            raise http_exc
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error interno del servidor: {e}")
+
     def calculate_profit(self, local_price: float):
         return local_price + (local_price * Constants.PROFIT_MARGIN)
 
     def calculate_local_price(self, cost_usd: float, exchange_rate: float):
         return cost_usd * exchange_rate
-"""
-    async def low_stock_books(self):
-        pass
-"""

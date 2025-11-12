@@ -9,3 +9,5 @@ class Constants:
     PAGE_LENGHT = 10
 
     PAGE_INIT = 0
+
+    DEFAULT_THRESHOLD = 10

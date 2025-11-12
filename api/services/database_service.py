@@ -152,11 +152,24 @@ def search_category_to_db(category: Optional[str]):
     init_db()
     session = SessionLocal()
     try:
-        print(category)
         query = session.query(Book)
         if category:
             query = query.filter(Book.category.ilike(f"%{category}%"))
         books = query.order_by(Book.category, Book.id).all()
+        return books
+    except Exception:
+        raise
+    finally:
+        session.close()
+
+def search_by_stock_quantity_to_db(threshold: Optional[int]):
+    init_db()
+    session = SessionLocal()
+    try:
+        query = session.query(Book)
+        if threshold is not None:
+            query = query.filter(Book.stock_quantity <= threshold)
+        books = query.order_by(Book.stock_quantity, Book.id).all()
         return books
     except Exception:
         raise

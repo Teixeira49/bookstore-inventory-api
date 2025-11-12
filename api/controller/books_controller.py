@@ -52,6 +52,15 @@ async def create_book(book: BookCreate = Body()):
 async def search_books(category: Optional[str] = Query(None, description="Buscar libros por categoría (búsqueda parcial)")):
     return await books_service.search_books(category)
 
+
+@router.get("/books/low-stock", responses={
+    200: {"description": "Libros encontrados exitosamente."},
+    404: {"description": "No se encontraron libros con ese criterio."},
+    500: {"description": "Error interno del servidor."}
+})
+async def low_stock_books(threshold: Optional[int] = Query(None, description="Buscar libros de bajo stock")):
+    return await books_service.low_stock_books(threshold) 
+
 # ============================================================================================
 #  >> Endpoints CRUD Básicos
 
@@ -88,14 +97,3 @@ async def delete_book_by_id(id: int):
 @router.post("/books/{id}/calculate-price") # la prueba decia que hiciera esto un post, pero lo veo mas como patch
 async def calculate_book_price(id: int, currency_code: LocalCurrency = Body()):
     return await books_service.calculate_book_price(id, currency_code) 
-
-
-"""
-@router.get("/books/low-stock")
-async def low_stock_books():
-    try:
-        exchange_rate = await books_service.low_stock_books() 
-        return {"exchange_rate": exchange_rate}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-"""

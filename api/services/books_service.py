@@ -1,5 +1,6 @@
 from typing import Optional
 from fastapi import HTTPException
+from datetime import datetime
 
 from api.services.database_service import *
 from api.services.exchanges_service import *
@@ -134,18 +135,27 @@ class BookService:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error interno del servidor: {e}")
 
+# --------------------------------------------------------------------
+#  >> Servicios para Endpoints Opcionales
+
+    async def search_books(self, category: Optional[str] = None):
+        try:
+            books = search_category_to_db(category)
+            if not books:
+                raise HTTPException(status_code=404, detail="No se encontraron libros.")
+            books_dict = [book.dict() for book in books]
+            return api_response(data=books_dict)
+        except HTTPException as http_exc:
+            raise http_exc
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error interno del servidor: {e}")
+        
     def calculate_profit(self, local_price: float):
         return local_price + (local_price * Constants.PROFIT_MARGIN)
 
     def calculate_local_price(self, cost_usd: float, exchange_rate: float):
         return cost_usd * exchange_rate
 """
-# --------------------------------------------------------------------
-#  >> Servicios para Endpoints Opcionales
-
-    async def search_books(self):
-        pass
-
     async def low_stock_books(self):
         pass
 """

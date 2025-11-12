@@ -1,8 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
-from typing import List
-from datetime import datetime
+from typing import Optional
 
 from ..models.book import Base, Book
 
@@ -146,5 +145,20 @@ def update_selling_price_local(book_data: Book, new_price: float):
     except Exception as e:
         session.rollback()
         raise e
+    finally:
+        session.close()
+
+def search_category_to_db(category: Optional[str]):
+    init_db()
+    session = SessionLocal()
+    try:
+        print(category)
+        query = session.query(Book)
+        if category:
+            query = query.filter(Book.category.ilike(f"%{category}%"))
+        books = query.order_by(Book.category, Book.id).all()
+        return books
+    except Exception:
+        raise
     finally:
         session.close()

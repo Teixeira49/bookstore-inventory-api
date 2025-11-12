@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Path, Body
+from fastapi import APIRouter, HTTPException, Query, Body
 from pydantic import Field
 from typing import Optional
 from api.models.book import Book
@@ -41,7 +41,20 @@ async def get_books_paginated(skip: int = 0, limit: int = 10):
 async def create_book(book: BookCreate = Body()):
     return await books_service.create_book(book)
 
-  
+# ============================================================================================
+#  >> Endpoint Opcionales (Rutas específicas van primero)
+# --------------------------------------------------------------------------------------------
+@router.get("/books/search", responses={
+    200: {"description": "Libros encontrados exitosamente."},
+    404: {"description": "No se encontraron libros con ese criterio."},
+    500: {"description": "Error interno del servidor."}
+})
+async def search_books(category: Optional[str] = Query(None, description="Buscar libros por categoría (búsqueda parcial)")):
+    return await books_service.search_books(category)
+
+# ============================================================================================
+#  >> Endpoints CRUD Básicos
+
 @router.get("/books/{id}", responses={
     200: {"description": "Libro encontrado exitosamente."},
     404: {"description": "El libro con el ID proporcionado no existe."},
@@ -76,18 +89,8 @@ async def delete_book_by_id(id: int):
 async def calculate_book_price(id: int, currency_code: LocalCurrency = Body()):
     return await books_service.calculate_book_price(id, currency_code) 
 
+
 """
-# ============================================================================================
-#  >> Endpoint Opcionales
-# --------------------------------------------------------------------------------------------
-@router.get("/books/search")
-async def search_books():
-    try:
-        exchange_rate = await books_service.search_books() 
-        return {"exchange_rate": exchange_rate}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
 @router.get("/books/low-stock")
 async def low_stock_books():
     try:

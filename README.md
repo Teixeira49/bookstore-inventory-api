@@ -25,10 +25,14 @@ Aqui se puede:
 - ✅ En tu terminal Ejecuta el comando: uvicorn api.main:app --reload
 - ⚠️ Si no funciona utiliza python -m uvicorn api.main:app --reload
 
-El codigo abre por defecto el servicio en la siguiente ruta: http://127.0.0.1:8000/
-
+El codigo abre por defecto el servicio en la siguiente ruta: 
+```
+http://127.0.0.1:8000/
+```
 Tambien puedes probar los endpoints en el siguiente enlace: 
-
+```
+https://bookstore-inventory-api-nine.vercel.app/
+```
 ## ⚙️ Dependencias Requeridas
 
 - pydanctic
@@ -62,6 +66,7 @@ Tambien puedes probar los endpoints en el siguiente enlace:
 ```
 http://127.0.0.1:8000/docs
 ```
-[Uploading Nextep Innovation - bookstore-inventory-api.postman_collection.json…]()
-
-- Tambien puedes exportar la siguiente coleccion de postman: https://drive.google.com/file/d/1uA1dMTYQrgzKxmyfuJEHsaUcmtb2GStc/view?usp=drive_link 
+- Tambien puedes exportar la siguiente coleccion de postman:
+```
+https://drive.google.com/file/d/1uA1dMTYQrgzKxmyfuJEHsaUcmtb2GStc/view?usp=drive_link
+```

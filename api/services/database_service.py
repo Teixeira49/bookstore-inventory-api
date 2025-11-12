@@ -178,6 +178,28 @@ def search_by_stock_quantity_to_db(threshold: Optional[int]):
     finally:
         session.close()
 
+def search_category_paginated_to_db(
+        category: Optional[str],
+        page: Optional[int] = None,
+        limit: Optional[int] = None
+    ):
+    init_db()
+    session = SessionLocal()
+    try:
+        query = session.query(Book)
+        if category:
+            skip = page * limit
+            query = query.filter(Book.category.ilike(f"%{category}%"))
+            books = query.order_by(Book.category, Book.id).offset(skip).limit(limit).all()
+            total_items = query.count()
+            return books, total_items
+        books = query.order_by(Book.category, Book.id).all()
+        total_items = query.count()
+        return books, total_items
+    except Exception:
+        raise
+    finally:
+        session.close()
 
 def search_by_stock_quantity_paginated_to_db(
     threshold: Optional[int],

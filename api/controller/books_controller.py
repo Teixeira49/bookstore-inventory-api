@@ -47,17 +47,13 @@ async def create_book(book: BookCreate = Body()):
 # ============================================================================================
 #  >> Endpoint Opcionales (Rutas específicas van primero)
 # --------------------------------------------------------------------------------------------
-@router.get("/books/search", responses={
+@router.get("/books/search/all", responses={
     200: {"description": "Libros encontrados exitosamente."},
     404: {"description": "No se encontraron libros con ese criterio."},
     500: {"description": "Error interno del servidor."}
 })
-async def search_books(
-    category: Optional[str] = Query(None, description="Buscar libros por categoría (búsqueda parcial)"),
-    page: int = Query(0, ge=0, description="Número de página (comienza en 0)."),
-    limit: int = Query(10, ge=1, description="Cantidad de elementos por página (mínimo 1).")
-):
-    return await books_service.search_books(category, page=page, limit=limit)
+async def search_books(category: Optional[str] = Query(None, description="Buscar libros por categoría (búsqueda parcial)")):
+    return await books_service.search_books(category)
 
 
 @router.get("/books/low-stock/all", responses={
@@ -69,6 +65,18 @@ async def low_stock_books(threshold: Optional[int] = Query(None, description="Bu
     return await books_service.low_stock_books(threshold) 
 
 # Versiones Paginadas
+
+@router.get("/books/search", responses={
+    200: {"description": "Libros encontrados exitosamente."},
+    404: {"description": "No se encontraron libros con ese criterio."},
+    500: {"description": "Error interno del servidor."}
+})
+async def search_books_paginated(
+    category: Optional[str] = Query(None, description="Buscar libros por categoría (búsqueda parcial)"),
+    page: int = Query(0, ge=0, description="Número de página (comienza en 0)."),
+    limit: int = Query(10, ge=1, description="Cantidad de elementos por página (mínimo 1).")
+):
+    return await books_service.search_books_paginated(category, page=page, limit=limit)
 
 @router.get("/books/low-stock", responses={
     200: {"description": "Libros encontrados exitosamente."},

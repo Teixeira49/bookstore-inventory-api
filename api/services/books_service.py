@@ -166,15 +166,32 @@ class BookService:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error interno del servidor: {e}")
 
-    def calculate_profit(self, local_price: float):
-        return local_price + (local_price * Constants.PROFIT_MARGIN)
-
-    def calculate_local_price(self, cost_usd: float, exchange_rate: float):
-        return cost_usd * exchange_rate
-
 # --------------------------------------------------------------------
 #   >> Versiones Paginadas de Servicios para Endpoints Opcionales
 
+    async def search_books_paginated(
+            self, 
+            category: Optional[str] = None,         
+            page: Optional[int] = None,
+            limit: Optional[int] = None
+        ):
+        try:
+            if page is None:
+                page = Constants.PAGE_INIT
+            
+            if limit is None:
+                limit = Constants.PAGE_LENGHT
+
+            books, total_items = search_category_paginated_to_db(category, page=page, limit=limit)
+            if not books:
+                raise HTTPException(status_code=404, detail="No se encontraron libros.")
+            books_dict = [book.dict() for book in books]
+            return api_response_paginated(data=books_dict, page=page, limit=limit, total_items=total_items)
+        except HTTPException as http_exc:
+            raise http_exc
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error interno del servidor: {e}")
+        
     async def low_stock_books_paginated(
         self, 
         threshold: Optional[int] = None,
@@ -201,6 +218,9 @@ class BookService:
             raise http_exc
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error interno del servidor: {e}")
+
+# --------------------------------------------------------------------
+#   >> Otros metodos
 
     def calculate_profit(self, local_price: float):
         return local_price + (local_price * Constants.PROFIT_MARGIN)

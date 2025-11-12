@@ -40,7 +40,7 @@ class BookCreate(BookBase):
     pass
 
 
-class BookUpdate(BaseModel):
+class BookUpdate(BookBase):
     """
     Esquema para actualizar un libro. Todos los campos son opcionales.
     Las validaciones de BookBase se aplican si los campos están presentes.

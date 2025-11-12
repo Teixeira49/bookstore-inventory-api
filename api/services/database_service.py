@@ -28,12 +28,14 @@ def get_books_to_db():
     finally:
         session.close()
 
-def get_books_paginated_to_db(skip: int = 0, limit: int = 10):
+def get_books_paginated_to_db(page: int = 0, limit: int = 10):
     init_db()
     session = SessionLocal()
     try:
+        skip = page * limit
         books = session.query(Book).order_by(Book.id).offset(skip).limit(limit).all()
-        return books
+        total_items = session.query(Book).count()
+        return books, total_items
     except Exception:
         raise
     finally:
@@ -171,6 +173,30 @@ def search_by_stock_quantity_to_db(threshold: Optional[int]):
             query = query.filter(Book.stock_quantity <= threshold)
         books = query.order_by(Book.stock_quantity, Book.id).all()
         return books
+    except Exception:
+        raise
+    finally:
+        session.close()
+
+
+def search_by_stock_quantity_paginated_to_db(
+    threshold: Optional[int],
+    page: Optional[int] = None,
+    limit: Optional[int] = None
+):
+    init_db()
+    session = SessionLocal()
+    try:
+        query = session.query(Book)
+        if threshold is not None:
+            skip = page * limit
+            query = query.filter(Book.stock_quantity <= threshold)
+            books = query.order_by(Book.stock_quantity, Book.id).offset(skip).limit(limit).all()
+            total_items = query.count()
+            return books, total_items
+        books = query.order_by(Book.stock_quantity, Book.id).all()
+        total_items = query.count()
+        return books, total_items
     except Exception:
         raise
     finally:

@@ -6,7 +6,7 @@ from api.services.database_service import *
 from api.services.exchanges_service import *
 from api.schemas.book_schema import BookCreate, BookUpdate, LocalCurrency
 from api.models.book import Book
-from api.utils.response_wrapper import api_response
+from api.utils.response_wrapper import *
 from api.utils.constants import Constants
 
 
@@ -28,12 +28,12 @@ class BookService:
 # --------------------------------------------------------------------
 #  >> Servicios para Endpoints CRUD Básicos
 
-    async def get_books_paginated(self, skip: int, limit: int):
+    async def get_books_paginated(self, page: int, limit: int):
         try:
-            books = get_books_paginated_to_db(skip=skip, limit=limit)
+            books, total_items = get_books_paginated_to_db(page=page, limit=limit)
             if not books:
                 raise HTTPException(status_code=404, detail="No se encontraron libros para esta página.")
-            return api_response(data=books)
+            return api_response_paginated(data=books, page=page, limit=limit, total_items=total_items)
         except HTTPException as http_exc:
             raise http_exc
         except Exception as e:
@@ -156,10 +156,47 @@ class BookService:
                 threshold = Constants.DEFAULT_THRESHOLD
             
             books = search_by_stock_quantity_to_db(threshold)
+
             if not books:
-                raise HTTPException(status_code=404, detail="No se encontraron libros.")
+                raise HTTPException(status_code=404, detail="No se encontraron libros con bajo stock.")
             books_dict = [book.dict() for book in books]
             return api_response(data=books_dict)
+        except HTTPException as http_exc:
+            raise http_exc
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error interno del servidor: {e}")
+
+    def calculate_profit(self, local_price: float):
+        return local_price + (local_price * Constants.PROFIT_MARGIN)
+
+    def calculate_local_price(self, cost_usd: float, exchange_rate: float):
+        return cost_usd * exchange_rate
+
+# --------------------------------------------------------------------
+#   >> Versiones Paginadas de Servicios para Endpoints Opcionales
+
+    async def low_stock_books_paginated(
+        self, 
+        threshold: Optional[int] = None,
+        page: Optional[int] = None,
+        limit: Optional[int] = None
+        ):
+        try:
+            if threshold is None:
+                threshold = Constants.DEFAULT_THRESHOLD
+            
+            if page is None:
+                page = Constants.PAGE_INIT
+            
+            if limit is None:
+                limit = Constants.PAGE_LENGHT
+
+            books, total_items = search_by_stock_quantity_paginated_to_db(threshold, page=page, limit=limit)
+
+            if not books:
+                raise HTTPException(status_code=404, detail="No se encontraron libros con bajo stock.")
+            books_dict = [book.dict() for book in books]
+            return api_response_paginated(data=books_dict, page=page, limit=limit, total_items=total_items)
         except HTTPException as http_exc:
             raise http_exc
         except Exception as e:

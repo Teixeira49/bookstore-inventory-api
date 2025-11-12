@@ -29,8 +29,11 @@ async def get_books():
     404: {"description": "No se encontraron libros."},
     500: {"description": "Error interno del servidor."}
 })
-async def get_books_paginated(skip: int = 0, limit: int = 10):
-    return await books_service.get_books_paginated(skip=skip, limit=limit)
+async def get_books_paginated(
+    page: int = Query(0, ge=0, description="Número de página (comienza en 0)."),
+    limit: int = Query(10, ge=1, description="Cantidad de elementos por página (mínimo 1).")
+):
+    return await books_service.get_books_paginated(page=page, limit=limit)
 
 
 @router.post("/books", responses={
@@ -49,17 +52,36 @@ async def create_book(book: BookCreate = Body()):
     404: {"description": "No se encontraron libros con ese criterio."},
     500: {"description": "Error interno del servidor."}
 })
-async def search_books(category: Optional[str] = Query(None, description="Buscar libros por categoría (búsqueda parcial)")):
-    return await books_service.search_books(category)
+async def search_books(
+    category: Optional[str] = Query(None, description="Buscar libros por categoría (búsqueda parcial)"),
+    page: int = Query(0, ge=0, description="Número de página (comienza en 0)."),
+    limit: int = Query(10, ge=1, description="Cantidad de elementos por página (mínimo 1).")
+):
+    return await books_service.search_books(category, page=page, limit=limit)
 
+
+@router.get("/books/low-stock/all", responses={
+    200: {"description": "Libros encontrados exitosamente."},
+    404: {"description": "No se encontraron libros con ese criterio."},
+    500: {"description": "Error interno del servidor."}
+})
+async def low_stock_books(threshold: Optional[int] = Query(None, description="Buscar libros de bajo stock.")):
+    return await books_service.low_stock_books(threshold) 
+
+# Versiones Paginadas
 
 @router.get("/books/low-stock", responses={
     200: {"description": "Libros encontrados exitosamente."},
     404: {"description": "No se encontraron libros con ese criterio."},
     500: {"description": "Error interno del servidor."}
 })
-async def low_stock_books(threshold: Optional[int] = Query(None, description="Buscar libros de bajo stock")):
-    return await books_service.low_stock_books(threshold) 
+async def low_stock_books_paginated(
+    threshold: Optional[int] = Query(None, description="Buscar libros de bajo stock."),
+    page: Optional[int] = Query(None, ge=0, description="Número de página (comienza en 0, opcional). Si no se especifica, se retornan todos los libros."),
+    limit: Optional[int] = Query(None, ge=1, description="Cantidad de elementos por página (mínimo 1, opcional). Si no se especifica, se retornan todos los libros.")
+):
+    return await books_service.low_stock_books_paginated(threshold, page=page, limit=limit) 
+
 
 # ============================================================================================
 #  >> Endpoints CRUD Básicos

@@ -14,7 +14,8 @@ try:
     def root():
         return {
             "title": "bookstore-inventory-api",
-            "version": "1.0.0"
+            "version": "1.0.0",
+            "message": "Un pequeño consejo, escribe /docs en la ruta para ver todas mis funciones"
         }
 
 except Exception as e:

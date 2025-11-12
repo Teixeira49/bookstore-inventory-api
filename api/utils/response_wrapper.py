@@ -5,3 +5,10 @@ def api_response(data=None, detail="Success", status_code=200):
         "detail": detail,
         "data": data,
     }
+
+def api_response_paginated(data=None, detail="Success", status_code=200,):
+    return {
+        "status_code": status_code,
+        "detail": detail,
+        "data": data,
+    }

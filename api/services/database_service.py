@@ -29,6 +29,18 @@ def get_books_to_db():
     finally:
         session.close()
 
+def get_books_paginated_to_db(skip: int = 0, limit: int = 10):
+    init_db()
+    session = SessionLocal()
+    try:
+        books = session.query(Book).order_by(Book.id).offset(skip).limit(limit).all()
+        return books
+    except Exception:
+        raise
+    finally:
+        session.close()
+
+
 def find_book_by_isbn_to_db(isbn: str):
     init_db()
     session = SessionLocal()

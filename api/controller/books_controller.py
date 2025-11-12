@@ -10,6 +10,18 @@ router = APIRouter(prefix="/api")
 books_service = BookService()
 
 # ============================================================================================
+#  >> Endpoint GET sin Paginacion
+# --------------------------------------------------------------------------------------------
+
+@router.get("/books/all", responses={
+    200: {"description": "Lista de libros encontrada exitosamente."},
+    404: {"description": "No se encontraron libros."},
+    500: {"description": "Error interno del servidor."}
+})
+async def get_books():
+    return await books_service.get_books()
+
+# ============================================================================================
 #  >> Endpoints CRUD Básicos
 # --------------------------------------------------------------------------------------------
 @router.get("/books", responses={
@@ -17,8 +29,8 @@ books_service = BookService()
     404: {"description": "No se encontraron libros."},
     500: {"description": "Error interno del servidor."}
 })
-async def get_books():
-    return await books_service.get_books()
+async def get_books_paginated(skip: int = 0, limit: int = 10):
+    return await books_service.get_books_paginated(skip=skip, limit=limit)
 
 
 @router.post("/books", responses={

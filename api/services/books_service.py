@@ -13,14 +13,25 @@ class BookService:
     def __init__(self):
         pass
 
-# --------------------------------------------------------------------
-# #  >> Servicios para Endpoints CRUD Básicos
-
     async def get_books(self):
         try:
             books = get_books_to_db()
             if not books:
                 raise HTTPException(status_code=404, detail="No se encontraron libros.")
+            return api_response(data=books)
+        except HTTPException as http_exc:
+            raise http_exc
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+# --------------------------------------------------------------------
+#  >> Servicios para Endpoints CRUD Básicos
+
+    async def get_books_paginated(self, skip: int, limit: int):
+        try:
+            books = get_books_paginated_to_db(skip=skip, limit=limit)
+            if not books:
+                raise HTTPException(status_code=404, detail="No se encontraron libros para esta página.")
             return api_response(data=books)
         except HTTPException as http_exc:
             raise http_exc

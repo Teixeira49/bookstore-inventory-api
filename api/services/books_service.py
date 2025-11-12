@@ -111,22 +111,24 @@ class BookService:
         except Exception as e:
             raise e
         
+    async def delete_book_by_id(self, id: int):
+        try:
+            deleted_book = delete_book_by_id_to_db(id)
+            if not deleted_book:
+                raise HTTPException(status_code=404, detail=f"El libro con ID {id} no existe y no pudo ser eliminado.")
+            
+            return api_response(data={"deleted_book_id": id}, detail="Libro eliminado exitosamente", status_code=200)
+        except HTTPException as http_exc:
+            raise http_exc
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error interno del servidor: {e}")
+
     def calculate_profit(self, local_price: float):
         return local_price + (local_price * Constants.PROFIT_MARGIN)
 
     def calculate_local_price(self, cost_usd: float, exchange_rate: float):
         return cost_usd * exchange_rate
-
 """
-    async def delete_book_by_id(self, id: int):
-        pass
-
-# --------------------------------------------------------------------
-#  >> Servicios para Endpoints con Integración Externa (Importante)
-
-    async def calculate_book_price(self):
-        pass
-
 # --------------------------------------------------------------------
 #  >> Servicios para Endpoints Opcionales
 

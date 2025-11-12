@@ -104,7 +104,21 @@ def update_book(existing_book: Book, book_data: dict):
     return existing_book
 
 def delete_book_by_id_to_db(id: int):
-    pass
+    init_db()
+    session = SessionLocal()
+    try:
+        book_to_delete = session.query(Book).filter(Book.id == id).first()
+        if not book_to_delete:
+            return None
+        
+        session.delete(book_to_delete)
+        session.commit()
+        return book_to_delete
+    except Exception as e:
+        session.rollback()
+        raise e
+    finally:
+        session.close()
 
 def update_selling_price_local(book_data: Book, new_price: float):
     init_db()

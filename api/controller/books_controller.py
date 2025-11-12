@@ -48,15 +48,15 @@ async def get_book_by_id(id: int):
 async def update_book_by_id(id: int, book: BookUpdate = Body()):
     return await books_service.update_book_by_id(id, book) 
 
-"""
-@router.delete("/books/{id}")
+@router.delete("/books/{id}", responses={
+    200: {"description": "Libro eliminado exitosamente."},
+    404: {"description": "El libro con el ID proporcionado no existe."},
+    500: {"description": "Error interno del servidor."}
+})
 async def delete_book_by_id(id: int):
-    try:
-        exchange_rate = await books_service.delete_book_by_id(id) 
-        return {"exchange_rate": exchange_rate}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-"""
+    return await books_service.delete_book_by_id(id) 
+
+
 # ============================================================================================
 #  >> Endpoint con Integración Externa (Importante)
 # --------------------------------------------------------------------------------------------

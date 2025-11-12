@@ -61,7 +61,7 @@ async def search_books(category: Optional[str] = Query(None, description="Buscar
     404: {"description": "No se encontraron libros con ese criterio."},
     500: {"description": "Error interno del servidor."}
 })
-async def low_stock_books(threshold: Optional[int] = Query(None, description="Buscar libros de bajo stock.")):
+async def low_stock_books(threshold: Optional[int] = Query(None, ge=0, description="Buscar libros de bajo stock.")):
     return await books_service.low_stock_books(threshold) 
 
 # Versiones Paginadas
@@ -84,7 +84,7 @@ async def search_books_paginated(
     500: {"description": "Error interno del servidor."}
 })
 async def low_stock_books_paginated(
-    threshold: Optional[int] = Query(None, description="Buscar libros de bajo stock."),
+    threshold: Optional[int] = Query(None, ge=0, description="Buscar libros de bajo stock."),
     page: Optional[int] = Query(None, ge=0, description="Número de página (comienza en 0, opcional). Si no se especifica, se retornan todos los libros."),
     limit: Optional[int] = Query(None, ge=1, description="Cantidad de elementos por página (mínimo 1, opcional). Si no se especifica, se retornan todos los libros.")
 ):

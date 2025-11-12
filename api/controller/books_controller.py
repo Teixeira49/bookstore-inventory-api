@@ -3,15 +3,11 @@ from pydantic import Field
 from typing import Optional
 from api.models.book import Book
 from api.services.books_service import BookService
-from api.schemas.book_schema import BookCreate, BookUpdate
+from api.schemas.book_schema import BookCreate, BookUpdate, LocalCurrency
 
 router = APIRouter(prefix="/api")
 
 books_service = BookService()
-
-class FilterParams:
-    actualRate: bool = Field(True)
-    
 
 # ============================================================================================
 #  >> Endpoints CRUD Básicos
@@ -60,15 +56,15 @@ async def delete_book_by_id(id: int):
         return {"exchange_rate": exchange_rate}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+"""
 # ============================================================================================
 #  >> Endpoint con Integración Externa (Importante)
 # --------------------------------------------------------------------------------------------
 @router.post("/books/{id}/calculate-price") # la prueba decia que hiciera esto un post, pero lo veo mas como patch
-async def calculate_book_price(id: int, ):
-    return await books_service.calculate_book_price() 
+async def calculate_book_price(id: int, currency_code: LocalCurrency = Body()):
+    return await books_service.calculate_book_price(id, currency_code) 
 
-
+"""
 # ============================================================================================
 #  >> Endpoint Opcionales
 # --------------------------------------------------------------------------------------------

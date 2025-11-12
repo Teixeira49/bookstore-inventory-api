@@ -27,7 +27,7 @@ class BookUpdate(BaseModel):
     supplier_country: Optional[str] = None
 
 class LocalCurrency(BaseModel):
-    currency_code: str = Field(..., gt=0, description="Debe contener algun codigo valido")
+    code: str = Field(..., description="Debe contener algun codigo valido")
 
 class Config:
     orm_mode = True

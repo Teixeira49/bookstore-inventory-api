@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 try:
-    from api.controller.books_controller import router as controller_app
+    from api.controller.v1.books_controller import router as controller_app
 
     app = FastAPI(title="bookstore-inventory-api")
     app.include_router(controller_app)
@@ -21,7 +21,7 @@ try:
 except Exception as e:
     tb = traceback.format_exc()
     app = FastAPI(title="bookstore-inventory-api - Import Error")
-    exception = Exception.with_traceback
+    exception = e
 
     @app.get("/")
     async def root():

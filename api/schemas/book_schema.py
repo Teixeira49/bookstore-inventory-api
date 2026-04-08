@@ -66,5 +66,9 @@ class LocalCurrency(BaseModel):
     def code_must_be_uppercase(cls, v):
         return v.upper()
 
-class Config:
-    orm_mode = True
+class BookResponse(BookBase):
+    """Esquema para la visualizar un libro, incluye el ID."""
+    id: int
+
+    class Config:
+        from_attributes = True

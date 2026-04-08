@@ -1,18 +1,18 @@
-from fastapi import FastAPI
 import traceback
+import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 load_dotenv()
 
+# Inicializamos la app en el nivel superior para que Uvicorn pueda encontrarla siempre
+app = FastAPI(title="bookstore-inventory-api")
+
 try:
     from api.controller.v1.books_controller import router as controller_app
 
-    import os
-    from fastapi.middleware.cors import CORSMiddleware
-
-    app = FastAPI(title="bookstore-inventory-api")
-
-    # Obtener orígenes permitidos desde variables de entorno
+    # Configuración de CORS
     cors_origins_env = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:8000")
     origins = [origin.strip() for origin in cors_origins_env.split(",")]
 
@@ -35,15 +35,14 @@ try:
         }
 
 except Exception as e:
+    # Si algo falla en las importaciones, reconfiguramos la app para mostrar el error
     tb = traceback.format_exc()
-    app = FastAPI(title="bookstore-inventory-api - Import Error")
-    exception = e
+    app.title = "bookstore-inventory-api - Import Error"
 
     @app.get("/")
     async def root():
-        return {"error": "import_failed", "message": str(exception)}
+        return {"error": "import_failed", "message": str(e)}
 
     @app.get("/__import_error")
     async def import_error():
-        # endpoint temporal para ver la traza completa en los logs/response
         return {"traceback": tb}
